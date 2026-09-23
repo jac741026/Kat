@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>脆熱門貼文</title>
+<meta name="description" content="整理 Threads（脆）上近期的熱門貼文">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<style>
+:root {
+  --bg: #f6f5f2; --card: #ffffff; --text: #1c1b19; --muted: #6f6c66; --line: #e6e3dd;
+  --accent: #d9480f; --accent-soft: #fff0e8; --chip: #efede8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --card: #1c1c1c; --text: #eeeae4; --muted: #9a958d; --line: #2c2c2c;
+    --accent: #ff8a4c; --accent-soft: #2e1d14; --chip: #262626;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --card: #1c1c1c; --text: #eeeae4; --muted: #9a958d; --line: #2c2c2c;
+  --accent: #ff8a4c; --accent-soft: #2e1d14; --chip: #262626;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 0 8px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: 22px; letter-spacing: .02em; }
+h1 span { color: var(--accent); }
+.meta { color: var(--muted); font-size: 13px; }
+.controls { display: flex; gap: 8px; padding-bottom: 10px; flex-wrap: wrap; }
+input[type=search], select {
+  font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 7px 10px;
+}
+input[type=search] { flex: 1 1 200px; min-width: 0; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; border: 0; background: var(--chip); color: var(--text); font: inherit; font-size: 13px;
+  padding: 4px 12px; border-radius: 999px; cursor: pointer;
+}
+.chip.on { background: var(--accent); color: #fff; }
+main { padding: 16px 0 48px; }
+.post { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+.head { display: flex; align-items: center; gap: 10px; }
+.rank { flex: none; width: 28px; text-align: center; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rank.top { color: var(--accent); }
+.avatar { position: relative; width: 36px; height: 36px; border-radius: 50%; background: var(--accent-soft); flex: none; overflow: hidden; }
+.avatar::before { content: attr(data-l); position: absolute; inset: 0; display: grid; place-items: center; color: var(--accent); font-weight: 700; }
+.avatar img { position: relative; width: 100%; height: 100%; object-fit: cover; }
+.who { min-width: 0; }
+.who a { color: var(--text); font-weight: 600; text-decoration: none; }
+.who a:hover { text-decoration: underline; }
+.who .v { color: #1d9bf0; font-size: 12px; }
+.who small { display: block; color: var(--muted); font-size: 12px; }
+.body { margin: 10px 0 0; white-space: pre-wrap; word-break: break-word; }
+.body.clamp { display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
+.more { background: none; border: 0; color: var(--accent); font: inherit; font-size: 13px; padding: 2px 0; cursor: pointer; }
+.media { position: relative; margin-top: 10px; }
+.media img { display: block; max-width: 100%; max-height: 360px; border-radius: 10px; border: 1px solid var(--line); }
+.badge { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.65); color: #fff; font-size: 12px; padding: 1px 8px; border-radius: 999px; }
+.stats { display: flex; gap: 16px; margin-top: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; flex-wrap: wrap; align-items: center; }
+.stats .go { margin-left: auto; color: var(--accent); text-decoration: none; }
+.tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.tags span { font-size: 12px; color: var(--muted); background: var(--chip); padding: 0 8px; border-radius: 999px; }
+.empty { text-align: center; color: var(--muted); padding: 40px 0; }
+footer { color: var(--muted); font-size: 12px; text-align: center; padding: 0 16px 32px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <h1>脆<span>熱門</span>貼文</h1>
+      <div class="meta" id="meta">載入中…</div>
+    </div>
+    <div class="controls">
+      <input type="search" id="q" placeholder="搜尋內容或帳號…" aria-label="搜尋">
+      <select id="sort" aria-label="排序">
+        <option value="score">綜合熱度</option>
+        <option value="likes">讚數</option>
+        <option value="replies">回覆數</option>
+        <option value="reposts">轉發數</option>
+        <option value="takenAt">最新</option>
+      </select>
+      <select id="range" aria-label="時間範圍">
+        <option value="0">全部時間</option>
+        <option value="1">24 小時內</option>
+        <option value="3">3 天內</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+<main class="wrap" id="list"></main>
+<footer>資料來源：Threads 公開搜尋結果，定期自動更新。點「看原文」前往 Threads。</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = { posts: [], tag: '全部', q: '', sort: 'score', range: 0, shown: 50 };
+const nf = new Intl.NumberFormat('zh-TW', { notation: 'compact', maximumFractionDigits: 1 });
+const fmt = (n) => (n >= 10000 ? nf.format(n) : n.toLocaleString('zh-TW'));
+
+function ago(ts) {
+  const s = Date.now() / 1000 - ts;
+  if (s < 3600) return Math.max(1, Math.floor(s / 60)) + ' 分鐘前';
+  if (s < 86400) return Math.floor(s / 3600) + ' 小時前';
+  return Math.floor(s / 86400) + ' 天前';
+}
+function esc(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function filtered() {
+  const q = state.q.trim().toLowerCase();
+  const min = state.range ? Date.now() / 1000 - state.range * 86400 : 0;
+  return state.posts
+    .filter((p) => state.tag === '全部' || p.sources.includes(state.tag))
+    .filter((p) => p.takenAt >= min)
+    .filter((p) => !q || p.text.toLowerCase().includes(q) || p.username.toLowerCase().includes(q))
+    .sort((a, b) => b[state.sort] - a[state.sort]);
+}
+
+function card(p, i) {
+  const long = p.text.length > 220 || p.text.split('\n').length > 8;
+  const media = p.image
+    ? `<div class="media"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(p.image)}" alt="" onerror="this.parentElement.remove()">${
+        p.isVideo ? '<span class="badge">▶ 影片</span>' : p.mediaCount > 1 ? `<span class="badge">1/${p.mediaCount}</span>` : ''
+      }</div>`
+    : '';
+  return `<article class="post">
+    <div class="head">
+      <div class="rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
+      <div class="avatar" data-l="${esc((p.username.match(/[a-z0-9]/i) || ["?"])[0].toUpperCase())}"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(p.avatar || '')}" alt="" onerror="this.remove()"></div>
+      <div class="who">
+        <a href="https://www.threads.com/@${esc(p.username)}" target="_blank" rel="noopener">${esc(p.username)}</a>${p.verified ? ' <span class="v" title="已驗證">✔</span>' : ''}
+        <small>${ago(p.takenAt)}</small>
+      </div>
+    </div>
+    ${p.text ? `<div class="body ${long ? 'clamp' : ''}">${esc(p.text)}</div>${long ? '<button class="more">展開全文</button>' : ''}` : ''}
+    ${media}
+    <div class="stats">
+      <span title="讚">♥ ${fmt(p.likes)}</span>
+      <span title="回覆">💬 ${fmt(p.replies)}</span>
+      <span title="轉發">🔁 ${fmt(p.reposts)}</span>
+      ${p.quotes ? `<span title="引用">❝ ${fmt(p.quotes)}</span>` : ''}
+      <a class="go" href="${esc(p.url)}" target="_blank" rel="noopener">看原文 ↗</a>
+    </div>
+    <div class="tags">${p.sources.map((s) => `<span>#${esc(s)}</span>`).join('')}</div>
+  </article>`;
+}
+
+function render() {
+  const list = filtered();
+  const items = list.slice(0, state.shown);
+  $('#list').innerHTML = items.length
+    ? items.map(card).join('') + (list.length > state.shown ? `<button class="chip" id="loadmore" style="display:block;margin:8px auto">顯示更多（剩 ${list.length - state.shown} 則）</button>` : '')
+    : '<div class="empty">沒有符合條件的貼文</div>';
+}
+
+function renderChips(keywords) {
+  const counts = {};
+  for (const p of state.posts) for (const s of p.sources) counts[s] = (counts[s] || 0) + 1;
+  const tags = ['全部', ...keywords.filter((k) => counts[k])];
+  $('#chips').innerHTML = tags
+    .map((t) => `<button class="chip ${t === state.tag ? 'on' : ''}" data-tag="${esc(t)}">${esc(t)}${t === '全部' ? '' : ' ' + counts[t]}</button>`)
+    .join('');
+}
+
+document.addEventListener('click', (e) => {
+  const chip = e.target.closest('[data-tag]');
+  if (chip) {
+    state.tag = chip.dataset.tag; state.shown = 50;
+    document.querySelectorAll('[data-tag]').forEach((c) => c.classList.toggle('on', c === chip));
+    render(); window.scrollTo({ top: 0 });
+  }
+  if (e.target.classList.contains('more')) {
+    const body = e.target.previousElementSibling;
+    const open = body.classList.toggle('clamp');
+    e.target.textContent = open ? '展開全文' : '收合';
+  }
+  if (e.target.id === 'loadmore') { state.shown += 50; render(); }
+});
+$('#q').addEventListener('input', (e) => { state.q = e.target.value; state.shown = 50; render(); });
+$('#sort').addEventListener('change', (e) => { state.sort = e.target.value; render(); });
+$('#range').addEventListener('change', (e) => { state.range = +e.target.value; render(); });
+
+fetch('data/posts.json', { cache: 'no-cache' })
+  .then((r) => r.json())
+  .then((d) => {
+    state.posts = d.posts;
+    const t = new Date(d.updatedAt).toLocaleString('zh-TW', { hour12: false, dateStyle: 'short', timeStyle: 'short' });
+    $('#meta').textContent = `${d.count} 則 · 更新於 ${t}`;
+    renderChips(d.keywords);
+    render();
+  })
+  .catch(() => { $('#meta').textContent = '資料載入失敗'; });
+</script>
+</body>
+</html>

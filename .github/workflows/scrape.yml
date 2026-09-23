@@ -1,0 +1,35 @@
+name: 更新脆熱門貼文
+
+on:
+  schedule:
+    - cron: '0 0,6,12 * * *' # 台灣時間 08:00 / 14:00 / 20:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run scrape
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: 更新熱門貼文 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
+          git push
